@@ -1,27 +1,14 @@
 
 public class User {
+	
+	//class to simulate the presentation shell
 	User(){
 		
 	}
 	
-	public void create(String filename) {
+	public static void main(String[] args) {
 		
 	}
 	
-	public void destroy(String filename) {
-		
-	}
-	public void open(String filename) {
-		
-	}
-	public void read(int index, int mem_area, int count) {
-		
-	}
 	
-	public void write(int index, int mem_area, int count) {
-		
-	}
-	public void lseek(int index, int pos) {
-		
-	}
 }
