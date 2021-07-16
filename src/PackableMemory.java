@@ -97,7 +97,7 @@ class PackableMemory
 	   System.out.println("packableMemory 32 Bytes");
 	   PackableMemory pm1 = new PackableMemory(64);
 	   pm1.packTest();
-	   
+	
 	   
 	   
    }

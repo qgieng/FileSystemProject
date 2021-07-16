@@ -6,10 +6,15 @@ public class IOSystem {
 		this.LDISK = new PackableMemory[CONSTANTS.LDISK_SIZE];
 		for(int i = 0; i < CONSTANTS.LDISK_SIZE; i++) {
 			LDISK[i] = new PackableMemory(CONSTANTS.BLOCK_SIZE);
+			
+			for(int c = 0; c < CONSTANTS.BLOCK_SIZE/Integer.BYTES ; c++) {
+				LDISK[i].pack(-1, c*Integer.BYTES);
+			}
 		}
 		//bitmap
 		this.LDISK[0].pack(0, 0);
 		this.LDISK[0].pack(0, 4);
+		
 		
 	}
 	/**
@@ -21,8 +26,14 @@ public class IOSystem {
 	 */
 	public void read_block(int block_num , char[] p) {
 		
-		for(int index = 0; index < p.length; index++){
+		for(int index = 0; index < CONSTANTS.BLOCK_SIZE; index++){
 			p[index] =(char) this.LDISK[block_num].mem[index];
+		}
+	}
+	
+	public void read_block(int block_num, PackableMemory p) {
+		for(int i = 0; i < CONSTANTS.BLOCK_SIZE; i++) {
+			p.mem[i] = this.LDISK[block_num].mem[i];
 		}
 	}
 	/**
@@ -33,8 +44,14 @@ public class IOSystem {
 	 * @param p
 	 */
 	public void write_block(int block_num , char[] p ) {
-		for(int index = 0;  index < p.length; index++) {
+		for(int index = 0;  index < CONSTANTS.BLOCK_SIZE; index++) {
 			this.LDISK[block_num].mem[index] = (byte) p[index];
+		}
+	}
+	
+	public void write_block(int block_num , PackableMemory p ) {
+		for(int index = 0;  index < CONSTANTS.BLOCK_SIZE; index++) {
+			this.LDISK[block_num].mem[index] =  p.mem[index];
 		}
 	}
 	/**
@@ -54,7 +71,7 @@ public class IOSystem {
 	
 	public void IOTest_1() {
 		System.out.println("IOTest_1");
-		char[] test1 = "TESTTEST".toCharArray();
+		char[] test1 = "TESTTEST                                                         ".toCharArray();
 		char[] test1_result = new char[test1.length];
 		this.write_block(23, test1 );
 		System.out.println("testing write into block23");
@@ -101,7 +118,7 @@ public class IOSystem {
 	
 	public static void main(String[] args) {
 		IOSystem ldisk = new IOSystem();
-		//ldisk.IOTest_1();
+		ldisk.IOTest_1();
 		//ldisk.IOTest_2();
 		//ldisk.IOTest_3();
 	}

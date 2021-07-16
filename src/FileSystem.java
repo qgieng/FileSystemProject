@@ -5,8 +5,14 @@ public class FileSystem {
 		IOSystem fs = new IOSystem();
 	}
 	
+	
+	
 	public void create(String filename) {
+		//find free file descriptor
 		
+		//fine free directory entry
+		
+		//fill both entries
 	}
 	
 	public void destroy(String filename) {
@@ -30,6 +36,13 @@ public class FileSystem {
 	 */
 	public void directory() {
 		
+	}
+	
+	private int find_free_fd() {
+		int free_fd = -1;
+		
+		
+		return free_fd;
 	}
 	
 	

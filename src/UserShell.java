@@ -7,6 +7,7 @@ public class UserShell {
 	}
 	
 	public static void main(String[] args) {
+		UserShell shell = new UserShell();
 		
 	}
 	
