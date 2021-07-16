@@ -25,6 +25,12 @@ public class FileSystem {
 	public void lseek(int index, int pos) {
 		
 	}
+	/**
+	 * List the names of all files and their length
+	 */
+	public void directory() {
+		
+	}
 	
 	
 }
