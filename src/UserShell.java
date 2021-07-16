@@ -1,8 +1,8 @@
 
-public class User {
+public class UserShell {
 	
 	//class to simulate the presentation shell
-	User(){
+	UserShell(){
 		
 	}
 	

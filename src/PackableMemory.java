@@ -1,3 +1,5 @@
+import org.junit.Test;
+
 //This class contains implementations of methods to 
 //   -- pack an integer into 4 consecutive bytes of a byte array
 //   -- unpack an integer from 4 consecutive bytes of a byte array
@@ -53,7 +55,7 @@ class PackableMemory
    }
    
 
-
+   @Test
    // Test the above pack and unpack methods by iterating the following
    //  over all possible 4-byte integers: pack the integer,
    //  then unpack it, and then verify that the unpacked integer equals the
@@ -62,11 +64,42 @@ class PackableMemory
    //  positive to negative numbers happens implicitly due to integer overflow.
    public void packTest()
    {
+	    this.pack(0, 0);
+	    System.out.println("test 1: this.pack(0, 0) unpacked is: " + this.unpack(0));
+	    this.pack(101, 1);
+	    System.out.println("test 2: this.pack(101, 1) unpacked is: " + this.unpack(1));
+	    this.pack(500, 2);
+	    System.out.println("test 2: this.pack(101, 1) unpacked is: " + this.unpack(2));
+	    System.out.println("test 2: this.pack(101, 1) unpacked is: " + this.unpack(0));
+	    this.pack(-101, 3);
+	    System.out.println("test 3: this.pack(-101, 3) unpacked(2) is: " + this.unpack(2));
+	    System.out.println("test 4: this.pack(-101, 3) unpacked(3) is: " + this.unpack(3));
+	    this.pack(199, 0);
+	    System.out.println("test 5: this.pack(199, 0) unpacked(9) is: " + this.unpack(0));
 	    
+	    this.pack(-22, 28);
+	    System.out.println("test 5: this.pack(-22, 28) unpacked(28) is: " + this.unpack(28));
+	    
+	    this.pack(-22, 2 );
+	    System.out.println("test 5: this.pack(-22, 28) unpacked(29) is: " + this.unpack(29));
+	    System.out.println("test 5: this.pack(-22, 28) unpacked(30) is: " + this.unpack(30));
+	    
+	    this.pack(-22, 29);
+	    System.out.println("test 5: this.pack(-22, 28) unpacked(29) is: " + this.unpack(29));
+	    System.out.println("test 5: this.pack(-22, 28) unpacked(28) is: " + this.unpack(28));
    }
    
 
    // main routine to test the PackableMemory class by running the 
    //  packTest() method.
+   public static void main(String[] args) {
+	  
+	   System.out.println("packableMemory 32 Bytes");
+	   PackableMemory pm1 = new PackableMemory(64);
+	   pm1.packTest();
+	   
+	   
+	   
+   }
 
 }
