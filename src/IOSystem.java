@@ -1,19 +1,23 @@
 
 public class IOSystem {
 	
-	private PackableMemory LDISK[]= null;
+	private PackableMemory[] LDISK= null;
 	IOSystem(){
 		this.LDISK = new PackableMemory[CONSTANTS.LDISK_SIZE];
-		for(int i = 0; i < CONSTANTS.LDISK_SIZE; i++) {
+		//bitmap
+		this.LDISK[0] = new PackableMemory(CONSTANTS.BLOCK_SIZE);
+		this.LDISK[0].pack(0, 0);
+		this.LDISK[0].pack(0, 4);
+		
+		for(int i = 1; i < CONSTANTS.LDISK_SIZE; i++) {
 			LDISK[i] = new PackableMemory(CONSTANTS.BLOCK_SIZE);
 			
 			for(int c = 0; c < CONSTANTS.BLOCK_SIZE/Integer.BYTES ; c++) {
 				LDISK[i].pack(-1, c*Integer.BYTES);
 			}
 		}
-		//bitmap
-		this.LDISK[0].pack(0, 0);
-		this.LDISK[0].pack(0, 4);
+		
+		
 		
 		
 	}

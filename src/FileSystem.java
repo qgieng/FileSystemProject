@@ -9,7 +9,7 @@ public class FileSystem {
 	
 	public void create(String filename) {
 		//find free file descriptor
-		
+		int free_fd = find_free_fd();
 		//fine free directory entry
 		
 		//fill both entries
@@ -21,14 +21,24 @@ public class FileSystem {
 	public void open(String filename) {
 		
 	}
-	public void read(int index, int mem_area, int count) {
+	public void close(String filename) {
+		
+	}
+	public void read(int index, 
+					char[] mem_area,
+					int count) {
 		
 	}
 	
-	public void write(int index, int mem_area, int count) {
+	public void write(	
+						int index, 
+						char mem_area, 
+						int count) {
+		
 		
 	}
-	public void lseek(int index, int pos) {
+	public void lseek(int index, 
+						int pos) {
 		
 	}
 	/**
