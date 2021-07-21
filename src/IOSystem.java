@@ -12,15 +12,17 @@ public class IOSystem {
 		for(int i = 1; i < CONSTANTS.LDISK_SIZE; i++) {
 			LDISK[i] = new PackableMemory(CONSTANTS.BLOCK_SIZE);
 			
-			for(int c = 0; c < CONSTANTS.BLOCK_SIZE/Integer.BYTES ; c++) {
-				LDISK[i].pack(-1, c*Integer.BYTES);
+			if( i <=  CONSTANTS.FILEDESCRIPTORS) {
+				for(int loc_index = 0; loc_index < (CONSTANTS.BLOCK_SIZE/Integer.BYTES) ; loc_index++) {
+					this.LDISK[i].pack(-1, loc_index * Integer.BYTES);
+				}
+			}
+			else {
+				LDISK[i].pack(-1, 0);
 			}
 		}
-		
-		
-		
-		
 	}
+	
 	/**
 	 * This copies the logical block ldisk[i] into main memory starting at the location
 		specified by the pointer p. The number of characters copied corresponds to the
@@ -84,9 +86,6 @@ public class IOSystem {
 		System.out.println("testing reading from block23");
 		this.read_block(23, test1_result);
 		System.out.println(test1_result );
-		
-		
-		
 	}
 	public void IOTest_2() {
 		System.out.println("IOTest_2");
@@ -117,13 +116,34 @@ public class IOSystem {
 			System.out.println("Array out of bound due to size of LDISK Block Size being 64, cannot write more than 64 characters into block");
 		}
 	}
-	
-	
+
+	public void IOTest_4() {
+		System.out.println("This is a test to check if all the allocated blocks are packed with correct data information");
+		
+		System.out.println("block[0] bitmap unpacked data: loc(0) " + this.LDISK[0].unpack(0));
+		System.out.println("block[0] bitmap unpacked data: loc(4) " + this.LDISK[0].unpack(0));
+		
+		System.out.println("block[1] file descriptor directory: " + this.LDISK[1].unpack(0));
+		
+		System.out.println("block[22] free block: " + this.LDISK[22].unpack(0));
+		System.out.println("block[22] free block(loc[4]): " + this.LDISK[22].unpack(4));
+		System.out.println("block[23] free block: " + this.LDISK[23].unpack(0));
+		System.out.println("block[23] free block(loc[4]): " + this.LDISK[23].unpack(4));
+		
+		System.out.println("block[24] free block: " + this.LDISK[24].unpack(0));
+		System.out.println("block[24] free block(loc[4]): " + this.LDISK[24].unpack(4));
+		System.out.println("block[30] free block: " + this.LDISK[30].unpack(0));
+		System.out.println("block[30] free block(loc[4]): " + this.LDISK[30].unpack(4));
+		System.out.println("block[63] free block: " + this.LDISK[63].unpack(0));
+		System.out.println("block[63] free block(loc[4]): " + this.LDISK[63].unpack(4));
+	}
 	
 	public static void main(String[] args) {
-		IOSystem ldisk = new IOSystem();
-		ldisk.IOTest_1();
+		IOSystem ldisk_1 = new IOSystem();
+		IOSystem ldisk_4 = new IOSystem();
+		ldisk_1.IOTest_1();
 		//ldisk.IOTest_2();
 		//ldisk.IOTest_3();
+		ldisk_4.IOTest_4();
 	}
 }
