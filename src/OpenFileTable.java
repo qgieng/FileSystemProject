@@ -12,5 +12,4 @@ public class OpenFileTable {
 		//directory FD = 0 / LDISK=1
 		table[0].setFileDescriptorIndex(0);
 	}
-	
 }

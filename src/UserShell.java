@@ -58,8 +58,21 @@ public class UserShell {
 				fs.directory();
 			}
 			else if(command.equals("in")) {
-				String fileName = user_input.substring(2);
-				break;
+				String[] arrInput = user_input.split(" " , 3);
+				if(arrInput.length == 1) {
+					fs.init();
+				}
+				else {
+					String fileName = user_input.substring(2);
+					if(fileName.length() > 4) {
+						System.out.println("Error: file length > 4");
+						break;
+					}
+					else{
+						fs.init(fileName);
+					}
+				}
+				
 			}
 			else if(command.equals("sv")) {
 				String filename = user_input.substring(2);

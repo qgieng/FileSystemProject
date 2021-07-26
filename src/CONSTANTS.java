@@ -8,4 +8,5 @@ public class CONSTANTS {
 	public final static int DESCRIPTOR_SIZE = 4;
 	public final static int FILEDESCRIPTORS = 24;
 	public final static int OFT_SIZE = 4;
+	public final static int DIRECTORY_FILE_NAME_SIZE = 4;	//	4 bytes
 }

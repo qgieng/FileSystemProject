@@ -16,10 +16,22 @@ public class OpenFileEntry {
 	public void setFileDescriptorIndex(int val) {
 		this.FileDescriptorIndex = val;
 	}
-	public void readBuffer(char[] p) {
-		
+	/**
+	 * Load LDISK data into buffer
+	 * @param p
+	 */
+	public void readBuffer(byte[] p) {
+		for(int i = 0; i < CONSTANTS.BLOCK_SIZE; i++) {
+			p[i] =  this.buf.mem[i];
+		}
 	}
-	public void writeBuffer(char[] p) {
-		
+	/**
+	 * write buffer data into LDISK
+	 * @param p
+	 */
+	public void writeBuffer(PackableMemory p) {
+		for(int i = 0; i < CONSTANTS.BLOCK_SIZE; i++) {
+			p.mem[i] = this.buf.mem[i];
+		}
 	}
 }

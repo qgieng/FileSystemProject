@@ -1,4 +1,5 @@
-
+import java.io.File;
+import java.io.IOException;
 public class IOSystem {
 	
 	private PackableMemory[] LDISK= null;
