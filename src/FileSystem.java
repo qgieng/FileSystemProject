@@ -86,10 +86,10 @@ public class FileSystem {
 		int free_fd = -1;
 		
 		PackableMemory rd_buffer = new PackableMemory(CONSTANTS.BLOCK_SIZE);
-		for(int  block_i = 1; block_i < CONSTANTS.FILEDESCRIPTORS; block_i++) {
+		//blocks1 - block 6 should be read....
+		for(int  block_i = 1; block_i <= CONSTANTS.FILEDESCRIPTORS/CONSTANTS.DESCRIPTOR_SIZE; block_i++) {
 			
 			this.filesystem.read_block(block_i, rd_buffer);
-			
 			//if block 1, then skip the directory file descriptor else start at 0
 			int byte_i = (block_i == 1)? (Integer.BYTES * CONSTANTS.DESCRIPTOR_SIZE) : 0;
 			
@@ -129,10 +129,10 @@ public class FileSystem {
 	 * @param file_desc
 	 * @param val
 	 */
-	private void set_fd(int file_desc,int val) {
+	private void set_fd(int file_desc_index,int val) {
 		PackableMemory fd_block = new PackableMemory(CONSTANTS.BLOCK_SIZE);
-		int block_num = file_desc/CONSTANTS.DESCRIPTOR_SIZE+1;
-		int fd_offset = 16*(file_desc - (CONSTANTS.DESCRIPTOR_SIZE * (block_num-1)));
+		int block_num = file_desc_index/CONSTANTS.DESCRIPTOR_SIZE+1;
+		int fd_offset = 16*(file_desc_index - (CONSTANTS.DESCRIPTOR_SIZE * (block_num-1)));
 		this.filesystem.read_block(block_num, fd_block);
 		fd_block.pack(val, fd_offset);
 		this.filesystem.write_block(block_num, fd_block);
@@ -161,7 +161,7 @@ public class FileSystem {
 		int fd_offset = 16*(file_desc - (CONSTANTS.DESCRIPTOR_SIZE * (block_num-1)));
 		this.filesystem.read_block(block_num, fd_block);
 		//logic
-		offset = (len_value/CONSTANTS.BLOCK_SIZE) * Integer.BYTES ;
+		//offset = (len_value/CONSTANTS.BLOCK_SIZE) * Integer.BYTES ;
 		fd_block.pack(free_block_index, fd_offset+offset);
 		this.filesystem.write_block(block_num,  fd_block);
 	}
@@ -234,11 +234,16 @@ public class FileSystem {
 		System.out.println("free fd upon after setting free_fd expected[9] : " + free_fd  + " result: " + (free_fd == 9));
 	}
 
-	/*
-	 * free_fd(block_i , fd_loc) = ((block_i -1) * 4) + (byte_i/16)
-	 * given the current design  of the ldisk, will calculate the file descriptor given block number and location number(0,16,32,48);
-	 * */
-	
+
+	public void test_find_free_fd_2() {
+		System.out.println("testing find free fd where there is no free fd");
+		
+		for(int i = 1; i < CONSTANTS.FILEDESCRIPTORS; i++) {
+			this.set_fd(i, 1);
+		}
+		int free_fd=this.find_free_fd();
+		System.out.println("free fd after allocating all fds [should be -1] :" + free_fd);
+	}
 	
 	public void test_get_fd_length() {
 		System.out.println("Testing get_fd_length");
@@ -251,8 +256,30 @@ public class FileSystem {
 		
 		this.set_fd(20, 64);
 		System.out.println("setting fd[20] with length 64.... getting fd length of fd[20] " + this.get_fd_length(20));
+		this.set_fd(24, 4);
+		System.out.println("setting fd[24] with length 4.... getting fd length of fd[24] " + this.get_fd_length(24));
 	}
 	
+	public void test_get_set_block_index() {
+		System.out.println("testing set_fd_freeblock/ get_block_index() functions");
+		this.set_fd_freeblock(1, 4, 0, 8);
+		System.out.println("this.set_fd_freeblock(1, 4, 0, 8); should get back 8 when getting block index(1,4) : " + this.get_block_index(1, 4));
+		this.set_fd_freeblock(1, 8, 0, 10);
+		System.out.println("this.set_fd_freeblock(1, 8, 0, 10); should get back 10 when getting block index(1,4) : " + this.get_block_index(1, 8));
+		this.set_fd_freeblock(1, 12, 0, 11);
+		System.out.println("this.set_fd_freeblock(1, 12, 0, 11); should get back 11 when getting block index(1,4) : " + this.get_block_index(1, 12));
+	
+		this.set_fd_freeblock(23, 4, 0, 18);
+		System.out.println("this.set_fd_freeblock(23, 4, 0, 18); should get back 18 when getting block index(1,4) : " + this.get_block_index(23, 4));
+		this.set_fd_freeblock(23, 8, 0, 19);
+		System.out.println("this.set_fd_freeblock(23, 8, 0, 19); should get back 19 when getting block index(1,4) : " + this.get_block_index(23, 8));
+		this.set_fd_freeblock(23, 12, 0, 20);
+		System.out.println("this.set_fd_freeblock(23, 12, 0, 20); should get back 20 when getting block index(1,4) : " + this.get_block_index(23, 12));
+	}
+	/*
+	 * free_fd(block_i , fd_loc) = ((block_i -1) * 4) + (byte_i/16)
+	 * given the current design  of the ldisk, will calculate the file descriptor given block number and location number(0,16,32,48);
+	 * */
 	public void test_calculate_free_fd() {
 		System.out.println("testing function that calculates free file descriptor");
 		
@@ -288,7 +315,9 @@ public class FileSystem {
 		//fsystem.test_calculate_free_fd();
 		//fsystem.test_find_free_fd();
 		//fsystem1.test_find_free_fd_1();
-		fsystem2.test_get_fd_length();
+		//fsystem1.test_find_free_fd_2();
+		//fsystem2.test_get_fd_length();
+		//fsystem1.test_get_set_block_index();
 	}
 	
 	
