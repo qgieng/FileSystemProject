@@ -27,8 +27,12 @@ public class FileSystem {
 			 this.MASK2[i] = ~this.MASK[i];
 		 }
 		 for(int i = 0; i < CONSTANTS.LDISK_SIZE; i++) {
-			 this.BITMAP[i] = (i <=  CONSTANTS.FILEDESCRIPTORS/CONSTANTS.DESCRIPTOR_SIZE)? 1:0;
+			 this.BITMAP[i] = 0;
 		 }
+		 for(int i = 0; i <= CONSTANTS.FILEDESCRIPTORS/CONSTANTS.DESCRIPTOR_SIZE; i++) {
+			this.set_bitmap(i, 1);
+		 }
+		 
 		 
 	}
 	
@@ -118,7 +122,8 @@ public class FileSystem {
 			
 			for(; byte_i < CONSTANTS.BLOCK_SIZE; byte_i += (Integer.BYTES *CONSTANTS.DESCRIPTOR_SIZE)) {
 				if(rd_buffer.unpack(byte_i) == -1) {
-					free_fd = calculate_free_fd(block_i, byte_i);
+					free_fd = calculate_free_fd(block_i, 
+												byte_i);
 					return free_fd;
 				}
 			}
@@ -127,12 +132,12 @@ public class FileSystem {
 	}
 	private int find_free_block() {
 		int free_block_i=-1;
-		for(int bitmap_i =0 ; bitmap_i < CONSTANTS.BLOCK_SIZE; bitmap_i++) {
-			for(int mask_i = 0; mask_i < CONSTANTS.BLOCK_SIZE;mask_i++) {
-				if((this.BITMAP[bitmap_i] & this.MASK[mask_i]) == 0) {
-					free_block_i =bitmap_i;
-					return bitmap_i;
-				}
+		long bm = condense_bitmap();
+		for(int mask_i = 0; mask_i < CONSTANTS.BLOCK_SIZE;mask_i++) {
+			long mask_temp = (bm & this.MASK[mask_i]);
+			if( mask_temp == 0) {
+				free_block_i = mask_i;
+				return mask_i;
 			}
 		}
 		
@@ -159,10 +164,24 @@ public class FileSystem {
 			this.BITMAP[index] = this.BITMAP[index] & this.MASK2[index];
 		}
 		else if(value == 1) {
-			this.BITMAP[index] = this.BITMAP[index] & this.MASK[index];
+			//System.out.println("before: "  + Long.toBinaryString(this.BITMAP[index]));
+			this.BITMAP[index] = this.BITMAP[index] | this.MASK[index];
+			//System.out.println("after: " + Long.toBinaryString(this.BITMAP[index]));
 		}
 	}
-	
+	/**
+	 * condense bitmap data array into a bitmap long
+	 * @return bitmap long
+	 */
+	private long condense_bitmap() {
+		long bm = 0;
+		
+		for(long mask : this.BITMAP) {
+			bm = bm | mask;
+		}
+		//System.out.println(Long.toBinaryString(bm));
+		return bm;
+	}
 	
 	/**
 	 * this will set the length of a file descriptor to val
@@ -225,6 +244,20 @@ public class FileSystem {
 	private int calculate_free_fd(int block_i, int fd_loc) {
 		return ((block_i-1) * CONSTANTS.DESCRIPTOR_SIZE) + (fd_loc/16);
 	}
+	
+	
+	public void test_set_bitmap() {
+		System.out.println("Testing setbitmap");
+		int free_block = this.find_free_block();
+		System.out.println("Free block initial iteration: Expected 7 "  + free_block);
+		this.set_bitmap(free_block, 1);
+		free_block = this.find_free_block();
+		System.out.println("Free block after setting free block7: Expected 8 result:"  + free_block);
+		this.set_bitmap(free_block, 1);
+		free_block = this.find_free_block();
+		System.out.println("Free block after setting free block 8: Expected 9  result:"  + free_block);
+	}
+	
 	
 	/**
 	 * test find_free_fd and set_fd
@@ -363,6 +396,7 @@ public class FileSystem {
 		//fsystem1.test_find_free_fd_2();
 		//fsystem2.test_get_fd_length();
 		//fsystem1.test_get_set_block_index();
+		fsystem.test_set_bitmap();
 	}
 	
 	
