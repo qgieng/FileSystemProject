@@ -12,4 +12,9 @@ public class CONSTANTS {
 	
 	public final static int FREEBLOCK = 0;
 	public final static int USEDBLOCK = 1;
+	public final static int FIRST_INT_OFFSET = 4;
+	public final static int SECOND_INT_OFFSET = 8;
+	public final static int THIRD_INT_OFFSET = 12;
+	
+	public final static int DIRECTORY_FILEDESCRIPTOR_INDEX = 0;
 }

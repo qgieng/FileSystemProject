@@ -20,12 +20,12 @@ public class FileSystem {
 		 
 		 this.MASK[CONSTANTS.LDISK_SIZE-1]=1;
 		 for(int i = CONSTANTS.LDISK_SIZE-2; i >=0; i--){
-			 this.MASK[i] = this.MASK[i+1] << 1;
-			 
+			 this.MASK[i] = this.MASK[i+1] << 1; 
 		 }
 		 for(int i = 0; i < CONSTANTS.LDISK_SIZE; i++) {
 			 this.MASK2[i] = ~this.MASK[i];
 		 }
+		 
 		 for(int i = 0; i < CONSTANTS.LDISK_SIZE; i++) {
 			 this.BITMAP[i] = 0;
 		 }
@@ -39,7 +39,17 @@ public class FileSystem {
 	
 	public void init() {
 		this.OFT = new OpenFileTable();
+		//find free block and use it for directory.
+		int free_directory_block = this.find_free_block();
+		this.set_fd_freeblock(CONSTANTS.DIRECTORY_FILEDESCRIPTOR_INDEX, CONSTANTS.FIRST_INT_OFFSET, 0, free_directory_block);
+		this.set_bitmap(free_directory_block, CONSTANTS.USEDBLOCK);
+		this.set_fd(0, 0);
+		
+		//load the directory into OFT.
 		this.loadOFTable(0);
+		
+		
+		
 	}
 	
 	public void init(String filename) {
@@ -103,6 +113,7 @@ public class FileSystem {
 		this.filesystem.read_block(1, directory_block_fd);
 		
 		//this.OFT.table[FileDescriptorIndex].readBuffer();
+		
 	}
 	
 	/**
@@ -130,6 +141,10 @@ public class FileSystem {
 		}
 		return free_fd;
 	}
+	/**
+	 * Using the bitmap, finds a free unallocated block.
+	 * @return
+	 */
 	private int find_free_block() {
 		int free_block_i=-1;
 		long bm = condense_bitmap();
@@ -184,17 +199,20 @@ public class FileSystem {
 	}
 	
 	/**
-	 * this will set the length of a file descriptor to val
+	 * set the length of a file  to value
 	 * @param file_desc
 	 * @param val
 	 */
-	private void set_fd(int file_desc_index,int val) {
+	private void set_fd(int file_desc_index ,int val) {
 		PackableMemory fd_block = new PackableMemory(CONSTANTS.BLOCK_SIZE);
 		int block_num = file_desc_index/CONSTANTS.DESCRIPTOR_SIZE+1;
 		int fd_offset = 16*(file_desc_index - (CONSTANTS.DESCRIPTOR_SIZE * (block_num-1)));
-		this.filesystem.read_block(block_num, fd_block);
-		fd_block.pack(val, fd_offset);
-		this.filesystem.write_block(block_num, fd_block);
+		this.filesystem.read_block(block_num, 
+											fd_block);
+		fd_block.pack(val, 
+						fd_offset);
+		this.filesystem.write_block(block_num, 
+											fd_block);
 	}
 	/**
 	 * reads the file descriptor block and gets the length of file descriptor index
@@ -204,8 +222,8 @@ public class FileSystem {
 		PackableMemory fd_block = new PackableMemory(CONSTANTS.BLOCK_SIZE);
 		int block_num = file_desc/CONSTANTS.DESCRIPTOR_SIZE+1;
 		int fd_offset = 16*(file_desc - (CONSTANTS.DESCRIPTOR_SIZE * (block_num-1)));
-		this.filesystem.read_block(block_num, fd_block);
-		
+		this.filesystem.read_block(block_num, 
+											fd_block);
 		return fd_block.unpack(fd_offset);
 	}
 	
@@ -226,7 +244,7 @@ public class FileSystem {
 	}
 	
 	/**
-	 * get the block LDISK[i] index i from file descriptor
+	 * get the block LDISK[i] (index i) from file descriptor
 	 * @param file_desc
 	 * @param offset
 	 * @return
@@ -256,6 +274,29 @@ public class FileSystem {
 		this.set_bitmap(free_block, 1);
 		free_block = this.find_free_block();
 		System.out.println("Free block after setting free block 8: Expected 9  result:"  + free_block);
+	}
+	
+	
+	public void test_set_bitmap2() {
+		System.out.println("Testing setbitmap 2");
+		int free_block = this.find_free_block();
+		System.out.println("Free block initial iteration: Expected 7 "  + free_block);
+		this.set_bitmap(free_block, 1);
+		free_block = this.find_free_block();
+		System.out.println("Free block after setting free block 7: Expected 8 result: "  + free_block);
+		this.set_bitmap(free_block, 1);
+		free_block = this.find_free_block();
+		System.out.println("Free block after setting free block 8: Expected 9  result: "  + free_block);
+		this.set_bitmap(free_block, 1);
+		
+		System.out.println("Free block 7 after setting blocks 7,8,9");
+		this.set_bitmap(7, 0);
+		
+		free_block = this.find_free_block();
+		System.out.println("Free block after freeing block 7.... expected 7 result:  "  + free_block);
+		this.set_bitmap(free_block, 1);
+		free_block = this.find_free_block();
+		System.out.println("Free block after freeing block 7.... expected 10 result:  "  + free_block);
 	}
 	
 	
@@ -396,7 +437,7 @@ public class FileSystem {
 		//fsystem1.test_find_free_fd_2();
 		//fsystem2.test_get_fd_length();
 		//fsystem1.test_get_set_block_index();
-		fsystem.test_set_bitmap();
+		fsystem.test_set_bitmap2();
 	}
 	
 	
