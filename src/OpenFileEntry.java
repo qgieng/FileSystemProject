@@ -2,7 +2,7 @@
 public class OpenFileEntry {
 	private int pos = 0;
 	private int FileDescriptorIndex = 0;
-	private PackableMemory buf =  null;
+	public PackableMemory buf =  null;
 	
 	OpenFileEntry(int pos, int index){
 		this.pos = pos;
@@ -16,6 +16,21 @@ public class OpenFileEntry {
 	public void setFileDescriptorIndex(int val) {
 		this.FileDescriptorIndex = val;
 	}
+	/**
+	 * returns the current position of the opened file entry.
+	 * @return
+	 */
+	public int getPosition() {
+		return this.pos;
+	}
+	/**
+	 * returns the file descriptor index which file entry reference to.
+	 * @return
+	 */
+	public int getFileDescriptorIndex() {
+		return this.FileDescriptorIndex;
+	}
+	
 	/**
 	 * set data into buffer
 	 * Load LDISK data into buffer

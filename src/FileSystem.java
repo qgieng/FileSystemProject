@@ -36,22 +36,31 @@ public class FileSystem {
 		 
 	}
 	
-	
+	/**
+	 * set up the OFT and load the directory by reading the block and loading it into OFT.
+	 */
 	public void init() {
+		this.init = true;
 		this.OFT = new OpenFileTable();
 		//find free block and use it for directory.
-		int free_directory_block = this.find_free_block();
-		this.set_fd_freeblock(CONSTANTS.DIRECTORY_FILEDESCRIPTOR_INDEX, CONSTANTS.FIRST_INT_OFFSET, 0, free_directory_block);
-		this.set_bitmap(free_directory_block, CONSTANTS.USEDBLOCK);
+		int free_directory_block_index = this.find_free_block();
+		this.set_fd_freeblock(CONSTANTS.DIRECTORY_FILEDESCRIPTOR_INDEX, 
+								CONSTANTS.FIRST_INT_OFFSET, 
+								0, 
+								free_directory_block_index);
+		this.set_bitmap(free_directory_block_index, CONSTANTS.USEDBLOCK);
 		this.set_fd(0, 0);
 		
-		//load the directory into OFT.
-		this.loadOFTable(0);
-		
-		
-		
+		//get directory block and load block into OFT buffer.
+		PackableMemory directory_block = new PackableMemory(CONSTANTS.BLOCK_SIZE);
+		this.filesystem.read_block(free_directory_block_index, directory_block);
+		this.OFT.table[0].readBuffer(directory_block);
 	}
 	
+	/**
+	 * must read the data in the given file. loading the bitmap, OFT, directory, and etc. 
+	 * @param filename
+	 */
 	public void init(String filename) {
 		this.init = true;
 		//load directory into OFT.
@@ -69,10 +78,18 @@ public class FileSystem {
 		char[] cfilename = filename.toCharArray();
 		//find free file descriptor
 		int free_fd = find_free_fd();
-		//fine free directory entry
-		int free_directory_entry = find_free_directory_entry(cfilename);
+		//find free directory entry
+		//int free_directory_entry = find_free_directory_entry(cfilename);
+		int directory_length = this.get_fd_length(0);
+		for(int i = 0; i < directory_length; i++) {
+			
+		}
+		
 		//fill both entries
 		this.set_fd(free_fd, 0);
+		
+		
+		
 	}
 	
 	public void destroy(String filename) {
@@ -97,8 +114,32 @@ public class FileSystem {
 		
 		
 	}
+	/**
+	 * OFT Index. Moves position of OFT Index to pos value.
+	 * note. This is will do checks such that if pos is not within opened block it will load the block.
+	 * @param index
+	 * @param pos
+	 */
 	public void lseek(int index, 
 						int pos) {
+		int file_descriptor_index = this.OFT.table[index].getFileDescriptorIndex();
+		int file_descriptor_length = this.get_fd_length(file_descriptor_index);
+		
+		if(pos > file_descriptor_length) {
+			System.out.println("Error, the position is not valid because position > file length");
+			return;
+		}
+		
+		if(pos >=0 && pos < CONSTANTS.BLOCK_SIZE) {
+			//load  file block into OFT
+		}
+		else if(pos >= CONSTANTS.BLOCK_SIZE && pos < (2*CONSTANTS.BLOCK_SIZE)) {
+			//load file block into OFT
+		}
+		
+		
+		this.OFT.table[index].setPosition(pos);
+		
 		
 	}
 	/**
@@ -263,7 +304,9 @@ public class FileSystem {
 		return ((block_i-1) * CONSTANTS.DESCRIPTOR_SIZE) + (fd_loc/16);
 	}
 	
-	
+	/**
+	 * test set_bitmap...
+	 */
 	public void test_set_bitmap() {
 		System.out.println("Testing setbitmap");
 		int free_block = this.find_free_block();
@@ -276,7 +319,9 @@ public class FileSystem {
 		System.out.println("Free block after setting free block 8: Expected 9  result:"  + free_block);
 	}
 	
-	
+	/**
+	 * test set bitmap to 0 and set 1...test find free_block
+	 */
 	public void test_set_bitmap2() {
 		System.out.println("Testing setbitmap 2");
 		int free_block = this.find_free_block();
