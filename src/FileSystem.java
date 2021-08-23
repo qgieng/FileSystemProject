@@ -124,20 +124,28 @@ public class FileSystem {
 						int pos) {
 		int file_descriptor_index = this.OFT.table[index].getFileDescriptorIndex();
 		int file_descriptor_length = this.get_fd_length(file_descriptor_index);
+		PackableMemory buf = new PackableMemory(CONSTANTS.BLOCK_SIZE);
 		
 		if(pos > file_descriptor_length) {
 			System.out.println("Error, the position is not valid because position > file length");
 			return;
 		}
 		
-		if(pos >=0 && pos < CONSTANTS.BLOCK_SIZE) {
-			//load  file block into OFT
-		}
-		else if(pos >= CONSTANTS.BLOCK_SIZE && pos < (2*CONSTANTS.BLOCK_SIZE)) {
-			//load file block into OFT
-		}
+		//take current OFT file block and save it into memory.
+		int current_position = this.OFT.table[index].getPosition();
+		int block_offset = ((current_position/CONSTANTS.BLOCK_SIZE)+1) * Integer.BYTES;
+		int block_reference =  this.get_block_index(file_descriptor_index, block_offset); 
+		this.OFT.table[index].writeBuffer(buf);
+		this.filesystem.write_block(block_reference, buf);
 		
+		//load from memory into OFT.
+		// 65/64 = 1,63/64 = 0, 
+		block_offset = ((pos/CONSTANTS.BLOCK_SIZE)+1) * Integer.BYTES;
+		block_reference = this.get_block_index(file_descriptor_index, block_offset); 
+		this.filesystem.read_block(block_reference, buf);
+		this.OFT.table[index].readBuffer(buf);
 		
+		//set new position
 		this.OFT.table[index].setPosition(pos);
 		
 		
@@ -286,15 +294,22 @@ public class FileSystem {
 	
 	/**
 	 * get the block LDISK[i] (index i) from file descriptor
+	 * note: offset should be multiples of 4(4, 8, 12) for how file descriptors are designed.
+	 * note: offset should not be 0 since this value represents the length.
 	 * @param file_desc
 	 * @param offset
 	 * @return
 	 */
 	private int get_block_index(int file_desc, int offset) {
+		if(offset == 0) {
+			System.out.println("Error: function should have offset not be 0");
+			return -1;
+		}
 		PackableMemory fd_block = new PackableMemory(CONSTANTS.BLOCK_SIZE);
 		int block_num = file_desc/CONSTANTS.DESCRIPTOR_SIZE+1;
 		int fd_offset = 16*(file_desc - (CONSTANTS.DESCRIPTOR_SIZE * (block_num-1)));
-		this.filesystem.read_block(block_num, fd_block);
+		this.filesystem.read_block(block_num, 
+											fd_block);
 		
 		return fd_block.unpack(fd_offset+offset);
 	}

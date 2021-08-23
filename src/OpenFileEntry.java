@@ -32,7 +32,7 @@ public class OpenFileEntry {
 	}
 	
 	/**
-	 * set data into buffer
+	 * set data into OFT buffer
 	 * Load LDISK data into buffer
 	 * @param p
 	 */
@@ -42,7 +42,7 @@ public class OpenFileEntry {
 		}
 	}
 	/**
-	 * set data into buffer
+	 * set data into OFT buffer
 	 * Load LDISK data into buffer
 	 * @param p
 	 */
@@ -52,7 +52,7 @@ public class OpenFileEntry {
 		}
 	}
 	/**
-	 * write buffer data into LDISK
+	 * write buffer data into LDISK container p
 	 * @param p
 	 */
 	public void writeBuffer(PackableMemory p) {
